@@ -104,7 +104,6 @@ std::vector<T> PrimeEngine<T>::n_primes(T n) {
 	std::copy_n(primes_.begin(), n, local_primes.begin());
 	return local_primes;
 }
-z
 
 template <class T>
 std::vector<std::pair<T,T>> PrimeEngine<T>::FactorInteger(T n) {

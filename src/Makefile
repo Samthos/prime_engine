@@ -15,6 +15,7 @@ libprime_engine.a: $(obj)
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c -o $@ $^
 
+
 python: $(sobj)
 	@echo "Python built!"
 
@@ -25,4 +26,4 @@ $(sobj): %.so : %.cpp
 clean:
 	@-rm -f *.a *.o *.so
 
-.PHONY: clean
+.PHONY: clean python
