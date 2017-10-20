@@ -1,6 +1,8 @@
 *.o
 *.a
 *.swp
+*.out
+*.output
 
 doxygen/html
 doxygen/latex

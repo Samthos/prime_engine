@@ -1,19 +1,19 @@
-#include <cassert>
-#include <vector>
-#include <cstdint>
 #include <algorithm>
 #include <iostream>
+#include <cassert>
+#include <cstdint>
+#include <vector>
 
 #include "prime_engine.h"
 
-template <class T>
-PrimeEngine<T>::PrimeEngine(T maxPrime) : maxPrime_(maxPrime) {
+template <class INT>
+PrimeEngine<INT>::PrimeEngine(INT maxPrime) : maxPrime_(maxPrime) {
   generatePrimeQ();
   generatePrimes();
 }
 
-template <class T>
-void PrimeEngine<T>::generatePrimeQ() {
+template <class INT>
+void PrimeEngine<INT>::generatePrimeQ() {
   primeQ_.resize(maxPrime_);
   std::fill(primeQ_.begin(), primeQ_.end(), true);
   std::fill(primeQ_.begin(), primeQ_.begin()+2, false);
@@ -22,7 +22,7 @@ void PrimeEngine<T>::generatePrimeQ() {
 
   // screen out even number
   it = std::find(it+1, primeQ_.end(), true);
-  T i = std::distance(primeQ_.begin(), it);
+  INT i = std::distance(primeQ_.begin(), it);
   for (auto j = i * i; j < maxPrime_; j += i) {
     primeQ_[j] = false;
   }
@@ -37,9 +37,9 @@ void PrimeEngine<T>::generatePrimeQ() {
   }
 }
 
-template <class T>
-void PrimeEngine<T>::generatePrimes() {
-  primes_.resize(std::count_if(primeQ_.begin(), primeQ_.end(), [](bool i){return i;}));
+template <class INT>
+void PrimeEngine<INT>::generatePrimes() {
+  primes_.resize(std::count(primeQ_.begin(), primeQ_.end(), true));
 
   auto jt = primes_.begin();
   for (auto it = primeQ_.begin(); it != primeQ_.end(); it++) {
@@ -50,41 +50,58 @@ void PrimeEngine<T>::generatePrimes() {
   }
 }
 
-template <class T>
-bool PrimeEngine<T>::PrimeQ(T n) {
+template <class INT>
+bool PrimeEngine<INT>::PrimeQ(INT n) const {
   assert(n < maxPrime_);
   return primeQ_[n];
 }
 
-template <class T>
-T PrimeEngine<T>::PrimePi(T n) {
+template <class INT>
+bool PrimeEngine<INT>::PrimeQForce(INT n) const {
+  assert(sqrt(n) < maxPrime_);
+  if (n < maxPrime_) {
+    return primeQ_[n];
+  } else {
+    int index = 0;
+    while (primes_[index] < sqrt(n)) {
+      if (0 == n % primes_[index]) {
+        return false;
+      }
+      index++;
+    }
+    return true;
+  }
+}
+
+template <class INT>
+INT PrimeEngine<INT>::PrimePi(INT n) const {
   assert(n < maxPrime_);
   auto it = std::upper_bound(primes_.begin(), primes_.end(), n);
   return std::distance(primes_.begin(), it);
 }
 
-template <class T>
-T PrimeEngine<T>::Prime(T index) {
-  assert(index < primes_.size());
-  return primes_[index];
+template <class INT>
+INT PrimeEngine<INT>::Prime(INT index) const {
+  assert(index < numPrime_);
+  return primes_[index-1];
 }
 
-template <class T>
-T PrimeEngine<T>::numPrimes() {
-  return primes_.size();
+template <class INT>
+INT PrimeEngine<INT>::numPrimes() const {
+  return numPrime_;
 }
 
-template <class T>
-std::vector<std::pair<T,T>> PrimeEngine<T>::FactorInteger(T n) {
-  T count;
-  std::vector<std::pair<T,T>> returnList;
+template <class INT>
+std::vector<std::pair<INT,INT>> PrimeEngine<INT>::FactorInteger(INT n) const {
+  INT count;
+  std::vector<std::pair<INT,INT>> returnList;
 
   assert(sqrt(n) < maxPrime_);
 
   auto it = primes_.begin();
-  auto stop = std::upper_bound(primes_.begin(), primes_.end(), static_cast<T>(sqrt(n)));
+  auto stop = std::upper_bound(primes_.begin(), primes_.end(), static_cast<INT>(sqrt(n)));
   while (n > maxPrime_) {
-    it = std::find_if(it, stop, [n](T p) {return ((n%p)==0);});
+    it = std::find_if(it, stop, [n](INT p) {return ((n%p)==0);});
     if (it == stop) {
       break;
     }
@@ -99,7 +116,7 @@ std::vector<std::pair<T,T>> PrimeEngine<T>::FactorInteger(T n) {
 
   if (it != stop) {
     while (n != 1 && !primeQ_[n]) {
-      it = std::find_if(it, stop, [n](T p) {return ((n%p)==0);});
+      it = std::find_if(it, stop, [n](INT p) {return ((n%p)==0);});
       if (it == stop) {
         break;
       }
@@ -119,13 +136,30 @@ std::vector<std::pair<T,T>> PrimeEngine<T>::FactorInteger(T n) {
   return returnList;
 }
 
-template <class T>
-std::vector<T> PrimeEngine<T>::Divisors(T n) {
+template <class INT>
+INT PrimeEngine<INT>::IntegerFromFactors(const std::vector<std::pair<INT,INT>>& pf) const {
+  return std::accumulate(pf.begin(), pf.end(), 1, 
+    [](INT total, std::pair<INT,INT> p) {
+      for (INT i = 0; i < p.second; i++) {
+        total *= p.first;
+      }
+      return total;
+    });
+}
+
+template <class INT>
+std::vector<INT> PrimeEngine<INT>::Divisors(INT n) const {
   auto pf = FactorInteger(n);
+  return Divisors(pf);
+}
   
-  T i, v;
-  std::vector<T> returnList;
-  std::vector<T> indices(pf.size()+1);
+template <class INT>
+std::vector<INT> PrimeEngine<INT>::Divisors(const std::vector<std::pair<INT,INT>>& pf) const {
+  INT v;
+  UINT i;
+  INT j;
+  std::vector<INT> returnList;
+  std::vector<INT> indices(pf.size()+1);
 
   std::fill(indices.begin(), indices.end(), 0);
 
@@ -138,7 +172,7 @@ std::vector<T> PrimeEngine<T>::Divisors(T n) {
     v *= pf[i].first;
     while (indices[i] == (pf[i].second+1)) {
       indices[i] = 0;
-      for (int j = 0; j <= pf[i].second; j++) {
+      for (j = 0; j <= pf[i].second; j++) {
         v /= pf[i].first;
       }
 
@@ -154,9 +188,19 @@ std::vector<T> PrimeEngine<T>::Divisors(T n) {
   return returnList;
 }
 
-template <class T>
-T PrimeEngine<T>::EulerPhi(T n) {
+template <class INT>
+INT PrimeEngine<INT>::EulerPhi(INT n) const {
   auto pf = FactorInteger(n);
+  return EulerPhi(n, pf);;
+}
+
+template <class INT>
+INT PrimeEngine<INT>::EulerPhi(const std::vector<std::pair<INT,INT>>& pf) const {
+  return EulerPhi(IntegerFromFactors(pf), pf);;
+}
+
+template <class INT>
+INT PrimeEngine<INT>::EulerPhi(INT n, const std::vector<std::pair<INT,INT>>& pf) const {
   for (auto &it : pf) {
     n /= it.first;
     n *= it.first - 1;
@@ -164,13 +208,19 @@ T PrimeEngine<T>::EulerPhi(T n) {
   return n;
 }
 
-template <class T>
-T PrimeEngine<T>::DivisorSum(T n) {
-  T v, rVal = 1;
+template <class INT>
+INT PrimeEngine<INT>::DivisorSum(INT n) const {
   auto pf = FactorInteger(n);
+  return DivisorSum(pf);;
+}
+
+template <class INT>
+INT PrimeEngine<INT>::DivisorSum(const std::vector<std::pair<INT,INT>>& pf) const {
+  INT v, rVal = 1;
+  INT i;
   for (auto &it : pf) {
     v = 1;
-    for (int i = 0; i <= it.second; i++) {
+    for (i = 0; i <= it.second; i++) {
       v *= it.first;
     }
     v -= 1;
