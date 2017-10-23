@@ -41,6 +41,7 @@ class PrimeEngine{
   INT DivisorSum(const std::vector<std::pair<INT,INT>>&) const;
   INT DivisorSigma(INT, INT) const;
   INT DivisorSigma(const std::vector<std::pair<INT,INT>>&, INT) const;
+  INT DivisorSigma_(const std::vector<std::pair<INT,INT>>&, INT) const;
   INT DivisorCount(INT) const;
   INT DivisorCount(const std::vector<std::pair<INT,INT>>&) const;
 

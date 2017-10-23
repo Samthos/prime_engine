@@ -1,9 +1,6 @@
 Implement:
 	-RabinMiller(INT);
-	-DivisorSigma(INT, INT) const;
-	-DivisorSigma(const std::vector<std::pair<INT,INT>>&, INT) const;
-	-DivisorCount(INT) const;
-	-DivisorCount(const std::vector<std::pair<INT,INT>>&) const;
+	-Integer power
 
 Updates:
 	-Reimplement PrimeQ with Rabin-Miller test if input exceeds known primes; Remove PrimeQForce 
@@ -11,6 +8,7 @@ Updates:
 		-customized error messages with interrupt
 		-returning known values that indicate an error
 		-control behavior based on compile time flags
+	-smarter assert to check for integer overflows
 	-set up autotools
 	-doxygen
 	-build guide
@@ -18,4 +16,3 @@ Updates:
 
 Possible Additions:
 	-powermod
-	-power

@@ -191,12 +191,12 @@ std::vector<INT> PrimeEngine<INT>::Divisors(const std::vector<std::pair<INT,INT>
 template <class INT>
 INT PrimeEngine<INT>::EulerPhi(INT n) const {
   auto pf = FactorInteger(n);
-  return EulerPhi(n, pf);;
+  return EulerPhi(n, pf);
 }
 
 template <class INT>
 INT PrimeEngine<INT>::EulerPhi(const std::vector<std::pair<INT,INT>>& pf) const {
-  return EulerPhi(IntegerFromFactors(pf), pf);;
+  return EulerPhi(IntegerFromFactors(pf), pf);
 }
 
 template <class INT>
@@ -211,7 +211,7 @@ INT PrimeEngine<INT>::EulerPhi(INT n, const std::vector<std::pair<INT,INT>>& pf)
 template <class INT>
 INT PrimeEngine<INT>::DivisorSum(INT n) const {
   auto pf = FactorInteger(n);
-  return DivisorSum(pf);;
+  return DivisorSum(pf);
 }
 
 template <class INT>
@@ -225,6 +225,53 @@ INT PrimeEngine<INT>::DivisorSum(const std::vector<std::pair<INT,INT>>& pf) cons
     }
     v -= 1;
     rVal *= v / (it.first - 1);
+  }
+  return rVal;
+}
+
+template <class INT>
+INT PrimeEngine<INT>::DivisorCount(INT n) const {
+  auto pf = FactorInteger(n);
+  return DivisorCount(pf);
+}
+
+template <class INT>
+INT PrimeEngine<INT>::DivisorCount(const std::vector<std::pair<INT,INT>>& pf) const {
+  INT rVal = 1;
+  for (auto &it : pf) {
+    rVal *= (it.second + 1);
+  }
+  return rVal;
+}
+
+template <class INT>
+INT PrimeEngine<INT>::DivisorSigma(INT n, INT m) const {
+  auto pf = FactorInteger(n);
+  assert(m >= 0);
+  if (0 == m) {
+    return DivisorCount(pf);
+  } else if (1 == m) {
+    return DivisorSum(pf);
+  }
+  return DivisorSigma_(pf, m);
+}
+
+template <class INT>
+INT PrimeEngine<INT>::DivisorSigma(const std::vector<std::pair<INT,INT>>& pf, INT m) const {
+  assert(m >= 0);
+  if (0 == m) {
+    return DivisorCount(pf);
+  } else if (1 == m) {
+    return DivisorSum(pf);
+  }
+  return DivisorSigma_(pf, m);
+}
+
+template <class INT>
+INT PrimeEngine<INT>::DivisorSigma_(const std::vector<std::pair<INT,INT>>& pf, INT m) const {
+  INT rVal = 1;
+  for (auto &it : pf) {
+    rVal *= (pow(it.first, (it.second+1)*m) - 1) / (pow(it.first, m) - 1);
   }
   return rVal;
 }
